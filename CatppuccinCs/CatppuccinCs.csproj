@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../CatppuccinGenerate/CatppuccinGenerate.csproj" ReferenceOutputAssembly="false"/>
+  </ItemGroup>
+
+  <UsingTask TaskName="GenerateCatppuccinBindings" AssemblyFile="../CatppuccinGenerate/obj/Debug/net9/CatppuccinGenerate.dll"/>
+  <Target Name="GenerateCatppuccinBindingsTarget" BeforeTargets="CoreCompile" Outputs="Hi.cs">
+    <GenerateCatppuccinBindings />
+  </Target>
+</Project>
