@@ -1,5 +1,6 @@
 namespace CatppuccinCs;
-public enum CatppuccinThemeId {
+public enum CatppuccinFlavorId
+{
     Latte,
     Frappe,
     Macchiato,

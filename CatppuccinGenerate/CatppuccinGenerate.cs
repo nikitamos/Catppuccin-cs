@@ -12,7 +12,7 @@ public class GenerateCatppuccinBindings : Task
     {
         using var s = Assembly.GetAssembly(GetType())!.GetManifestResourceStream("palette.json")!;
         _palettes = JsonSerializer.Deserialize<CatppuccinPalettes>(s)!;
-        GenerateThemeRecord();
+        GenerateFlavorRecord();
         GenerateColorsEnum();
         GenerateCatppuccin();
         return true;
@@ -24,34 +24,33 @@ public class GenerateCatppuccinBindings : Task
         writer.WriteLine("#nullable enable\nnamespace CatppuccinCs;\npublic static partial class Catppuccin");
         writer.Block(() =>
         {
-            WriteThemeField(_palettes.latte, writer);
-            WriteThemeField(_palettes.frappe, writer, "Frappe");
-            WriteThemeField(_palettes.macchiato, writer);
-            WriteThemeField(_palettes.mocha, writer);
-            WriteSwitchAccessor(writer, "public static CatppuccinTheme? GetThemeById", "CatppuccinThemeId", (s) => $"CatppuccinThemeId.{s}", ["Latte", "Frappe", "Macchiato", "Mocha"]);
-            WriteSwitchAccessor(writer, "public static CatppuccinTheme? GetThemeByName", "string", (s) => $"\"{s}\"", ["Latte", "Frappe", "Macchiato", "Mocha"]);
+            WriteCatppuccinFlavorField(_palettes.latte, writer);
+            WriteCatppuccinFlavorField(_palettes.frappe, writer, "Frappe");
+            WriteCatppuccinFlavorField(_palettes.macchiato, writer);
+            WriteCatppuccinFlavorField(_palettes.mocha, writer);
+            WriteSwitchAccessor(writer, "public static CatppuccinFlavor? GetFlavorById", "CatppuccinFlavorId", (s) => $"CatppuccinFlavorId.{s}", ["Latte", "Frappe", "Macchiato", "Mocha"]);
         });
     }
-    public void WriteThemeField(CatppuccinTheme t, IndentedTextWriter w, string csThemeName = null)
+    public void WriteCatppuccinFlavorField(CatppuccinFlavor t, IndentedTextWriter w, string csFlavorName = null)
     {
-        w.WriteLine($"public static readonly CatppuccinTheme {csThemeName ?? Capitalize(t.name)} = new");
+        w.WriteLine($"public static readonly CatppuccinFlavor {csFlavorName ?? Capitalize(t.name)} = new");
         w.Block(() =>
         {
             foreach (var c in t.colors)
-                WriteThemeColorField(w, c.Value.name, c.Value.accent, c.Value.hex, CatppuccinColor.GetCsColorName(c.Key));
+                WriteFlavorColorField(w, c.Value.name, c.Value.accent, c.Value.hex, CatppuccinColor.GetCsColorName(c.Key));
             foreach (var c in t.ansiColors)
             {
-                WriteThemeColorField(w, c.Value.name, false, c.Value.hex, CatppuccinAnsiColor.GetNormalName(c.Key));
-                WriteThemeColorField(w, c.Value.name, false, c.Value.hex, CatppuccinAnsiColor.GetBrightName(c.Key));
+                WriteFlavorColorField(w, c.Value.name, false, c.Value.hex, CatppuccinAnsiColor.GetNormalName(c.Key));
+                WriteFlavorColorField(w, c.Value.name, false, c.Value.hex, CatppuccinAnsiColor.GetBrightName(c.Key));
             }
             w.WriteLine($"Name: \"{t.name}\",");
-            w.WriteLine($"Id: CatppuccinThemeId.{csThemeName ?? Capitalize(t.name)},");
+            w.WriteLine($"Id: CatppuccinFlavorId.{csFlavorName ?? Capitalize(t.name)},");
             w.WriteLine($"Emoji: \"{t.emoji}\",");
             w.WriteLine($"IsDark: {t.dark.ToString().ToLower()}");
         }, "(", ");");
     }
 
-    private static void WriteThemeColorField(IndentedTextWriter w, string humanReadableName, bool accent, string hexColor, string csColorName)
+    private static void WriteFlavorColorField(IndentedTextWriter w, string humanReadableName, bool accent, string hexColor, string csColorName)
     {
         w.WriteLine($"{csColorName}: new");
         w.Block(() =>
@@ -64,17 +63,17 @@ public class GenerateCatppuccinBindings : Task
         , "(", "),");
     }
 
-    public void GenerateThemeRecord()
+    public void GenerateFlavorRecord()
     {
-        using var f = File.CreateText("CatppuccinTheme.g.cs");
+        using var f = File.CreateText("CatppuccinFlavor.g.cs");
         using var writer = new IndentedTextWriter(f);
-        writer.WriteLine("#nullable enable\nnamespace CatppuccinCs;\npublic record CatppuccinTheme");
+        writer.WriteLine("#nullable enable\nnamespace CatppuccinCs;\npublic partial record CatppuccinFlavor");
         writer.Block(() =>
         {
             foreach (var col in _palettes.latte.CsColorNames)
                 writer.WriteLine("CatppuccinColor {0},", col);
             writer.WriteLine("string Name,");
-            writer.WriteLine("CatppuccinThemeId Id,");
+            writer.WriteLine("CatppuccinFlavorId Id,");
             writer.WriteLine("string Emoji,");
             writer.WriteLine("bool IsDark");
             writer.Indent = 0;
@@ -85,11 +84,6 @@ public class GenerateCatppuccinBindings : Task
                                 "public CatppuccinColor? GetColorById",
                                 "CatppuccinColorId",
                                 s => $"CatppuccinColorId.{s}",
-                                _palettes.latte.CsColorNames);
-            WriteSwitchAccessor(writer,
-                                "public CatppuccinColor? GetColorByName",
-                                "string",
-                                s => $"\"{s}\"",
                                 _palettes.latte.CsColorNames);
         });
     }

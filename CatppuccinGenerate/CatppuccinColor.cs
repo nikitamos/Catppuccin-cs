@@ -18,7 +18,7 @@ public record CatppuccinAnsiColor(
     public static string GetNormalName(string c) => $"Ansi{GenerateCatppuccinBindings.Capitalize(c)}Normal";
 }
 
-public record CatppuccinTheme(
+public record CatppuccinFlavor(
     string name,
     string emoji,
     int order,
@@ -38,8 +38,8 @@ public record CatppuccinTheme(
 
 public record CatppuccinPalettes(
     string version,
-    CatppuccinTheme latte,
-    CatppuccinTheme frappe,
-    CatppuccinTheme macchiato,
-    CatppuccinTheme mocha
+    CatppuccinFlavor latte,
+    CatppuccinFlavor frappe,
+    CatppuccinFlavor macchiato,
+    CatppuccinFlavor mocha
 );
