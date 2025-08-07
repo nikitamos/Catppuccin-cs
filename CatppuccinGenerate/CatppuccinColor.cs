@@ -28,6 +28,7 @@ public record CatppuccinFlavor(
 )
 {
     public IEnumerable<string> CsColorNames { get => _csColorNames; }
+    public int ColorCount { get => _csColorNames.Length; }
     private readonly string[] _csColorNames = colors.Keys.Select(CatppuccinColor.GetCsColorName)
                 .Concat(
                  (IEnumerable<string>)ansiColors.Keys.Select(CatppuccinAnsiColor.GetNormalName)

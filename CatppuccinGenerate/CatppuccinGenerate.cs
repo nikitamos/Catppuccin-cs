@@ -29,6 +29,7 @@ public class GenerateCatppuccinBindings : Task
             WriteCatppuccinFlavorField(_palettes.macchiato, writer);
             WriteCatppuccinFlavorField(_palettes.mocha, writer);
             WriteSwitchAccessor(writer, "public static CatppuccinFlavor? GetFlavorById", "CatppuccinFlavorId", (s) => $"CatppuccinFlavorId.{s}", ["Latte", "Frappe", "Macchiato", "Mocha"]);
+            writer.WriteLine("public static readonly int ColorCount = {0};", _palettes.latte.ColorCount);
         });
     }
     public void WriteCatppuccinFlavorField(CatppuccinFlavor t, IndentedTextWriter w, string csFlavorName = null)
