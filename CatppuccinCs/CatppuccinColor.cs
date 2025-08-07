@@ -5,4 +5,7 @@ public record CatppuccinColor(
     System.Drawing.Color Color,
     CatppuccinColorId ColorId,
     bool Accent
-);
+)
+{
+    public static implicit operator System.Drawing.Color(CatppuccinColor c) => c.Color;
+}
