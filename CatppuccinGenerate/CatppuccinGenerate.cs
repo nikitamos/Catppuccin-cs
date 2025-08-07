@@ -41,8 +41,8 @@ public class GenerateCatppuccinBindings : Task
                 WriteFlavorColorField(w, c.Value.name, c.Value.accent, c.Value.hex, CatppuccinColor.GetCsColorName(c.Key));
             foreach (var c in t.ansiColors)
             {
-                WriteFlavorColorField(w, c.Value.name, false, c.Value.hex, CatppuccinAnsiColor.GetNormalName(c.Key));
-                WriteFlavorColorField(w, c.Value.name, false, c.Value.hex, CatppuccinAnsiColor.GetBrightName(c.Key));
+                WriteFlavorColorField(w, c.Value.normal.name, false, c.Value.normal.hex, CatppuccinAnsiColor.GetNormalName(c.Key));
+                WriteFlavorColorField(w, c.Value.bright.name, false, c.Value.bright.hex, CatppuccinAnsiColor.GetBrightName(c.Key));
             }
             w.WriteLine($"Name: \"{t.name}\",");
             w.WriteLine($"Id: CatppuccinFlavorId.{csFlavorName ?? Capitalize(t.name)},");

@@ -24,7 +24,7 @@ public record CatppuccinFlavor(
     int order,
     bool dark,
     Dictionary<string, CatppuccinColor> colors,
-    Dictionary<string, CatppuccinColor> ansiColors
+    Dictionary<string, CatppuccinAnsiColor> ansiColors
 )
 {
     public IEnumerable<string> CsColorNames { get => _csColorNames; }
