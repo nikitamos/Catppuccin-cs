@@ -18,8 +18,9 @@ public class GenerateCatppuccinBindings : Task
     CatppuccinPalettes _palettes;
     public override bool Execute()
     {
-        using var s = Assembly.GetAssembly(GetType())!.GetManifestResourceStream("palette.json")!;
-        _palettes = JsonSerializer.Deserialize<CatppuccinPalettes>(s)!;
+        using var s = Assembly.GetAssembly(GetType()).GetManifestResourceStream("palette.json");
+        _palettes = JsonSerializer.Deserialize<CatppuccinPalettes>(s);
+
         Outputs = [
             GenerateFlavorRecord(),
             GenerateColorsEnum(),
@@ -50,11 +51,11 @@ public class GenerateCatppuccinBindings : Task
         w.Block(() =>
         {
             foreach (var c in t.colors)
-                WriteFlavorColorField(w, c.Value.name, c.Value.accent, c.Value.hex, CatppuccinColor.GetCsColorName(c.Key));
+                WriteFlavorColorField(w, c.Value, CatppuccinColor.GetCsColorName(c.Key));
             foreach (var c in t.ansiColors)
             {
-                WriteFlavorColorField(w, c.Value.normal.name, false, c.Value.normal.hex, CatppuccinAnsiColor.GetNormalName(c.Key));
-                WriteFlavorColorField(w, c.Value.bright.name, false, c.Value.bright.hex, CatppuccinAnsiColor.GetBrightName(c.Key));
+                WriteFlavorColorField(w, c.Value.normal, CatppuccinAnsiColor.GetNormalName(c.Key));
+                WriteFlavorColorField(w, c.Value.bright, CatppuccinAnsiColor.GetBrightName(c.Key));
             }
             w.WriteLine($"Name: \"{t.name}\",");
             w.WriteLine($"Id: CatppuccinFlavorId.{csFlavorName ?? Capitalize(t.name)},");
@@ -63,15 +64,17 @@ public class GenerateCatppuccinBindings : Task
         }, "(", ");");
     }
 
-    private static void WriteFlavorColorField(IndentedTextWriter w, string humanReadableName, bool accent, string hexColor, string csColorName)
+    private static void WriteFlavorColorField(IndentedTextWriter w, CatppuccinColor color, string csColorName)
     {
         w.WriteLine($"{csColorName}: new");
         w.Block(() =>
         {
-            w.WriteLine($"Name: \"{humanReadableName}\",");
-            w.WriteLine($"Color: System.Drawing.ColorTranslator.FromHtml(\"{hexColor}\"),");
+            w.WriteLine($"Name: \"{color.name}\",");
             w.WriteLine($"ColorId: CatppuccinColorId.{csColorName},");
-            w.WriteLine($"Accent: {accent.ToString().ToLower()}");
+            w.WriteLine($"Accent: {color.accent.ToString().ToLower()},");
+            w.WriteLine($"Rgb: {color.rgb},");
+            w.WriteLine($"Hsl: {color.hsl},");
+            w.WriteLine($"Hex: \"{color.hex}\"");
         }
         , "(", "),");
     }
@@ -122,7 +125,6 @@ public class GenerateCatppuccinBindings : Task
                                               IEnumerable<string> fields)
     {
         w.Write("{0} ({1} id) =>", MethodNameWithModifiers, ParameterType);
-        w.Indent++;
         w.WriteLine("id switch");
         w.Block(() =>
         {
@@ -130,7 +132,6 @@ public class GenerateCatppuccinBindings : Task
                 w.WriteLine("{0} => {1},", formatter(f), f);
             w.WriteLine("_ => null");
         }, closeBrace: "};");
-        w.Indent--;
     }
     public static string Capitalize(string s) => string.Concat(s[0].ToString().ToUpper(), s.AsSpan(1));
 }

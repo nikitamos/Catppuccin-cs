@@ -1,5 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<!-- Anyone who touches the following manuscript shall be
+     inevitably devoured by the Primordial Evil Of MSBuild. -->
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+   <OutputType>Library</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -10,7 +13,7 @@
   </ItemGroup>
   
   <UsingTask TaskName="GenerateCatppuccinBindings" AssemblyFile="../CatppuccinGenerate/obj/$(Configuration)/net9.0/CatppuccinGenerate.dll"/>
-  <Target Name="GenerateCatppuccinBindingsTarget" AfterTargets="Build">
+  <Target Name="GenerateCatppuccinBindingsTarget" AfterTargets="Build" BeforeTargets="CoreCompile">
     <GenerateCatppuccinBindings OutputDirectory="$(MSBuildProjectDirectory)">
       <Output PropertyName="GeneratedFiles" TaskParameter="Outputs"/>
     </GenerateCatppuccinBindings>

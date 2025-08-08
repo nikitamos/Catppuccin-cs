@@ -2,10 +2,12 @@ namespace CatppuccinCs;
 
 public record CatppuccinColor(
     string Name,
-    System.Drawing.Color Color,
     CatppuccinColorId ColorId,
-    bool Accent
+    bool Accent,
+    (byte R, byte G, byte B) Rgb,
+    (float H, float S, float L) Hsl,
+    string Hex
 )
 {
-    public static implicit operator System.Drawing.Color(CatppuccinColor c) => c.Color;
+    public static explicit operator System.Drawing.Color(CatppuccinColor c) => System.Drawing.Color.FromArgb(c.Rgb.R, c.Rgb.G, c.Rgb.B);
 }
