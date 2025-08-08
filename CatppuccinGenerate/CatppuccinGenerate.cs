@@ -1,4 +1,6 @@
 ﻿namespace CatppuccinGenerate;
+
+using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System.CodeDom.Compiler;
 using System.Reflection;
@@ -7,19 +9,28 @@ using System.Text.Json;
 
 public class GenerateCatppuccinBindings : Task
 {
+    public string OutputDirectory { get; set; }
+    [Output]
+    public string[] Outputs { get; set; } = [];
+    private const string FLAVOR_RECORD_FILENAME = "CatppuccinFlavor.g.cs";
+    private const string CATPPUCCIN_CLASS_FILENAME = "Catppuccin.g.cs";
+    private const string CATPPUCCIN_COLORS_ENUM_FILENAME = "CatppuccinColorId.g.cs";
     CatppuccinPalettes _palettes;
     public override bool Execute()
     {
         using var s = Assembly.GetAssembly(GetType())!.GetManifestResourceStream("palette.json")!;
         _palettes = JsonSerializer.Deserialize<CatppuccinPalettes>(s)!;
-        GenerateFlavorRecord();
-        GenerateColorsEnum();
-        GenerateCatppuccin();
+        Outputs = [
+            GenerateFlavorRecord(),
+            GenerateColorsEnum(),
+            GenerateCatppuccin()
+        ];
         return true;
     }
-    public void GenerateCatppuccin()
+    public string GenerateCatppuccin()
     {
-        using var f = File.CreateText("Catppuccin.g.cs");
+        var filepath = Path.Join(OutputDirectory, CATPPUCCIN_CLASS_FILENAME);
+        using var f = File.CreateText(filepath);
         using var writer = new IndentedTextWriter(f);
         writer.WriteLine("#nullable enable\nnamespace CatppuccinCs;\npublic static partial class Catppuccin");
         writer.Block(() =>
@@ -31,6 +42,7 @@ public class GenerateCatppuccinBindings : Task
             WriteSwitchAccessor(writer, "public static CatppuccinFlavor? GetFlavorById", "CatppuccinFlavorId", (s) => $"CatppuccinFlavorId.{s}", ["Latte", "Frappe", "Macchiato", "Mocha"]);
             writer.WriteLine("public static readonly int ColorCount = {0};", _palettes.latte.ColorCount);
         });
+        return filepath;
     }
     public void WriteCatppuccinFlavorField(CatppuccinFlavor t, IndentedTextWriter w, string csFlavorName = null)
     {
@@ -64,8 +76,9 @@ public class GenerateCatppuccinBindings : Task
         , "(", "),");
     }
 
-    public void GenerateFlavorRecord()
+    public string GenerateFlavorRecord()
     {
+        var filepath = Path.Join(OutputDirectory, FLAVOR_RECORD_FILENAME);
         using var f = File.CreateText("CatppuccinFlavor.g.cs");
         using var writer = new IndentedTextWriter(f);
         writer.WriteLine("#nullable enable\nnamespace CatppuccinCs;\npublic partial record CatppuccinFlavor");
@@ -87,10 +100,12 @@ public class GenerateCatppuccinBindings : Task
                                 s => $"CatppuccinColorId.{s}",
                                 _palettes.latte.CsColorNames);
         });
+        return filepath;
     }
-    public void GenerateColorsEnum()
+    public string GenerateColorsEnum()
     {
-        using var f = File.CreateText("CatppuccinColorId.g.cs");
+        var filepath = Path.Join(OutputDirectory, CATPPUCCIN_COLORS_ENUM_FILENAME);
+        using var f = File.CreateText(filepath);
         using var writer = new IndentedTextWriter(f);
         writer.WriteLine("namespace CatppuccinCs;\npublic enum CatppuccinColorId");
         writer.Block(() =>
@@ -98,6 +113,7 @@ public class GenerateCatppuccinBindings : Task
             foreach (var c in _palettes.latte.CsColorNames)
                 writer.WriteLine("{0},", c);
         });
+        return filepath;
     }
     public static void WriteSwitchAccessor(IndentedTextWriter w,
                                               string MethodNameWithModifiers,

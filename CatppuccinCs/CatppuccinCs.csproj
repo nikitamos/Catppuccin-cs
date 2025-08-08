@@ -8,9 +8,14 @@
   <ItemGroup>
     <ProjectReference Include="../CatppuccinGenerate/CatppuccinGenerate.csproj" ReferenceOutputAssembly="false"/>
   </ItemGroup>
-
-  <UsingTask TaskName="GenerateCatppuccinBindings" AssemblyFile="../CatppuccinGenerate/obj/Debug/net9/CatppuccinGenerate.dll"/>
-  <Target Name="GenerateCatppuccinBindingsTarget" BeforeTargets="CoreCompile" Outputs="Hi.cs">
-    <GenerateCatppuccinBindings />
+  
+  <UsingTask TaskName="GenerateCatppuccinBindings" AssemblyFile="../CatppuccinGenerate/obj/$(Configuration)/net9.0/CatppuccinGenerate.dll"/>
+  <Target Name="GenerateCatppuccinBindingsTarget" AfterTargets="Build">
+    <GenerateCatppuccinBindings OutputDirectory="$(MSBuildProjectDirectory)">
+      <Output PropertyName="GeneratedFiles" TaskParameter="Outputs"/>
+    </GenerateCatppuccinBindings>
+    <ItemGroup>
+      <Compile Include="$(GeneratedFiles)"/>
+    </ItemGroup>
   </Target>
 </Project>
