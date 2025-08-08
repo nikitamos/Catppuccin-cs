@@ -6,13 +6,18 @@ The color themes are automatically parsed and appropriate bindings are auto-gene
 ## Work-in-progress notice
 The work on the project is still in progress. Public API may change. No backward compatibility is guaranteed. `System.Drawing.Color` may be replaced with something else in future.
 
-**Note.** To build `CatppuccinCs` the `dotnet build` command must be run twice.
 ### Jobs to be done
 * [ ] Write tests.
 * [ ] Write docs.
-* [ ] Fix first build failure.
+* [x] Fix first build failure.
 * [ ] Stabilize `CatppuccinColor` API.
 * [ ] Release on [NuGet](nuget.org).
+
+## Build
+In `CatppuccinCs` directory execute the command:
+```
+dotnet build
+```
 
 ## Example
 
@@ -28,4 +33,4 @@ Console.WriteLine($"{latte.Name} {latte.Emoji}"); // Latte 🌻
 Console.WriteLine($"{latte.Flamingo.Color}");
 Console.WriteLine($"{latte.AnsiBlueBright.Name}"); // Bright Blue
 ```
-**Note.** See also `SimpleExample/Program.cs`.
+**Note.** See also [`SimpleExample/Program.cs`](https://github.com/nikitamos/Catppuccin-cs/blob/master/SimpleExample/Program.cs).
